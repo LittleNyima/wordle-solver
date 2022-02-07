@@ -1,5 +1,4 @@
 import os.path as osp
-import random
 
 from ordered_set import OrderedSet
 
@@ -15,17 +14,21 @@ class WordleDictionary:
         assert word.isalpha(), "Parameter 'word' must consist of characters"
         assert len(word) == 5, "Parameter 'word' must consist of 5 characters"
         return word.upper()
-    
-    def contains(self, word):
-        return word in self.words
 
-    def choice(self):
-        return random.choice(self.words)
+    def __iter__(self):
+        return self.words.__iter__()
+    
+    def __len__(self):
+        return self.words.__len__()
+
+    def __getitem__(self, index):
+        return self.words.__getitem__(index)
 
 
 if __name__ == "__main__":
+    import random
     dictionary = WordleDictionary()
-    assert dictionary.contains("APPLE")
-    assert not dictionary.contains("NYIMA")
+    assert "APPLE" in dictionary
+    assert "NYIMA" not in dictionary
     for _ in range(3):
-        print(dictionary.choice())
+        print(random.choice(dictionary))
