@@ -11,6 +11,7 @@ class WordleGame:
 class WordleGameWrapper:
     def __init__(self, secret, dictionary, quiet=False):
         self._secret = secret
+        self._secret_stats = self._stats(self._secret)
         self.dictionary = dictionary
         self.is_close = False
         self.quiet = quiet
@@ -20,7 +21,18 @@ class WordleGameWrapper:
         return self
     
     def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type:
+            print("Exception occurs during the game, giving up...")
+            self.give_up()
         self.is_close = True
+
+    @staticmethod
+    def _stats(word):
+        d = dict()
+        for idx, letter in enumerate(word):
+            d.setdefault(letter, [])
+            d[letter].append(idx)
+        return d
 
     def _validate(self, word):
         assert type(word) is str, "Parameter 'word' must be string"
@@ -34,10 +46,28 @@ class WordleGameWrapper:
         """ 0 - secret doesn't include the character
             1 - secret includes the character, but location is not exact
             2 - secret includes the character, and location is exact
+            
+            Additional explanation: 
+            If a character appears more times in the guess than in the answer,
+            the extra occurrence will lead to a `0`.
         """
-        return "".join(["0" if c not in self._secret else
-                        "1" if c != self._secret[idx] else
-                        "2" for idx, c in enumerate(word)])
+        word_stats = self._stats(word)
+        result = [None] * 5
+        for k, v in word_stats.items():
+            if k not in self._secret_stats:
+                for idx in v:
+                    result[idx] = "0"
+            else:
+                yellows = len(self._secret_stats[k])
+                for idx in v:
+                    if idx in self._secret_stats[k]:
+                        result[idx] = "2"
+                        yellows -= 1
+                for idx in v:
+                    if idx not in self._secret_stats[k]:
+                        result[idx] = "1" if yellows > 0 else "0"
+                        yellows -= 1
+        return "".join(result)
 
     def _print_result(self, word, result):
         print("".join(["X" if c == "0" else "O" if c == "1" else "V" for c in result]),
@@ -60,7 +90,7 @@ class WordleGameWrapper:
     
     def give_up(self):
         if self.is_close:
-            raise ValueError("Give up operation on an exit game")
+            raise ValueError("Give up operation on an exit game, the answer is %s" % self._secret)
         if not self.quiet:
             print("Give up after %d guesses, the secret is %s" % (self.attempts, self._secret))
         self.is_close = True
@@ -72,4 +102,7 @@ if __name__ == "__main__":
     with WordleGame(dictionary).new_game(0) as game:
         assert game.guess("ABYSS") == ("22000", 1)
         assert game.guess("BlACk") == ("10222", 2)
+        game.give_up()
+    with WordleGameWrapper("SLACK", dictionary) as game:
+        assert game.guess("SLASH") == ("22200", 1)
         game.give_up()
