@@ -28,3 +28,9 @@ class WordleProfiler:
         for idx, word in enumerate(self.dictionary):
             r[word] = self._evaluate_once(solver, idx)
         return r
+    
+    def evaluate_single_word(self, solver, word):
+        word = word.upper()
+        if word not in self.dictionary:
+            raise KeyError(word)
+        return self._evaluate_once(solver, self.dictionary.index(word))

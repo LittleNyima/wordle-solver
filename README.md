@@ -2,6 +2,11 @@
 
 Implementation of [Wordle - A daily word game (powerlanguage.co.uk)](https://www.powerlanguage.co.uk/wordle/) game and a framework of evaluating Wordle solvers.
 
+
+## Installation
+
+`pip install -r requirements.txt`
+
 ## Examples
 
 - You can play the game manually:

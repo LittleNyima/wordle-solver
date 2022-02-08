@@ -23,6 +23,9 @@ class WordleDictionary:
 
     def __getitem__(self, index):
         return self.words.__getitem__(index)
+    
+    def index(self, item):
+        return self.words.index(item)
 
 
 if __name__ == "__main__":
