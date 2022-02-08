@@ -10,11 +10,13 @@ class WordleProfiler:
     def _evaluate_once(self, solver, index):
         with self.banker.new_game(index) as game:
             result, tries = "", 0
-            while result != "22222" and tries < self.max_attempts:
+            while result != "22222" and tries <= self.max_attempts:
                 solver.before_guess()
                 guess = solver.guess()
                 result, tries = game.guess(guess)
                 solver.after_guess(result)
+            if result != "22222":
+                game.give_up()
         return tries
 
     def evaluate_once(self, solver):
