@@ -86,21 +86,16 @@ class TheGreatWzkSolver(BaseWordleSolver):
             raise ValueError("No possible candidate words. Blame LittleNyima for his banker and profiler!")
         self.prev_guess = best_word
         if self.verbose:
-            print("I guess", best_word)
+            print("I guess: ", best_word)
         return best_word         
 
     def after_guess(self, result):
         if result == '22222':
             if self.verbose:
                 print("I AM A GENIUS")
-            self.yellows = []
-            self.greens = []
-            self.blacks = set()
-            self.attempts = []
-            self.prev_guess = None
-            return
         else:
-            print("I don't believe it! How can I be wrong???")
+            if self.verbose:
+                print("I don't believe it! How can I be wrong???")
             # import os
             # os.system('shutdown')
 
@@ -118,11 +113,18 @@ class TheGreatWzkSolver(BaseWordleSolver):
                 seen_chars.add(self.prev_guess[i]) # TODO: uncomment this if result calculation (when duplicated chars exists) is changed
             elif ch == "0" and self.prev_guess[i] not in seen_chars:
                 self.blacks.add(self.prev_guess[i])
+    
+    def reset(self):
+        self.yellows = []
+        self.greens = []
+        self.blacks = set()
+        self.attempts = []
+        self.prev_guess = None
 
 
 if __name__ == "__main__":
     dictionary = WordleDictionary()
     profiler = WordleProfiler(dictionary)
     solver = TheGreatWzkSolver(dictionary, verbose=True)
-    print(profiler.evaluate_single_word(solver, "SADLY"))
-    print(profiler.evaluate_all(solver))
+    print(profiler.evaluate_once(solver, word="SADLY"))
+    # print(profiler.evaluate_all(solver))
