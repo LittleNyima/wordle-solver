@@ -10,3 +10,6 @@ class BaseWordleSolver:
 
     def after_guess(self, result):
         raise NotImplementedError
+
+    def reset(self):
+        raise NotImplementedError

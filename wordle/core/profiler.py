@@ -1,3 +1,5 @@
+import time
+import traceback
 from .banker import WordleGame
 
 class WordleProfiler:
@@ -9,28 +11,36 @@ class WordleProfiler:
 
     def _evaluate_once(self, solver, index):
         with self.banker.new_game(index) as game:
-            result, tries = "", 0
+            result, tries, initial, clock_time = "", 0, True, 0
             while result != "22222" and tries <= self.max_attempts:
-                solver.before_guess()
-                guess = solver.guess()
-                result, tries = game.guess(guess)
-                solver.after_guess(result)
+                try:
+                    if initial:
+                        solver.reset()
+                        initial = True
+                    tik = time.process_time()
+                    solver.before_guess()
+                    guess = solver.guess()
+                    result, tries = game.guess(guess)
+                    solver.after_guess(result)
+                    tok = time.process_time()
+                    clock_time += tok - tik
+                except:
+                    traceback.print_exc()
+                    print("Exception occurs during the game, giving up...")
+                    tries = self.max_attempts + 1
+                    break
             if result != "22222":
                 game.give_up()
-        return tries
+        return tries, clock_time
 
-    def evaluate_once(self, solver):
-        return self._evaluate_once(solver, None)
+    def evaluate_once(self, solver, index=None):
+        return self._evaluate_once(solver, index)
 
     def evaluate_all(self, solver):
-        r = dict()
+        r = {"words": {}, "time_cost": 0}
         self.record[solver.__class__.__name__] = r
         for idx, word in enumerate(self.dictionary):
-            r[word] = self._evaluate_once(solver, idx)
+            tries, clock_time = self._evaluate_once(solver, idx)
+            r["words"][word] = tries
+            r["time_cost"] += clock_time
         return r
-    
-    def evaluate_single_word(self, solver, word):
-        word = word.upper()
-        if word not in self.dictionary:
-            raise KeyError(word)
-        return self._evaluate_once(solver, self.dictionary.index(word))
