@@ -1,6 +1,8 @@
 import time
 import traceback
+
 from .banker import WordleGame
+
 
 class WordleProfiler:
     def __init__(self, dictionary, max_attempts=6):
