@@ -1,4 +1,5 @@
 from wordle import WordleDictionary, WordleProfiler, BaseWordleSolver
+from wordle.util import stats
 
 
 class TheGreatWzkSolver(BaseWordleSolver):
@@ -126,5 +127,7 @@ if __name__ == "__main__":
     dictionary = WordleDictionary()
     profiler = WordleProfiler(dictionary)
     solver = TheGreatWzkSolver(dictionary, verbose=True)
-    print(profiler.evaluate_once(solver, word="SADLY"))
+    print(profiler.evaluate_once(solver, index=dictionary.words.index("SADLY")))
     # print(profiler.evaluate_all(solver))
+    rdict = profiler.evaluate_all(solver)
+    stats.brief(rdict)
