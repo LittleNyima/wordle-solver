@@ -12,11 +12,11 @@ class WordleProfiler:
     def _evaluate_once(self, solver, index):
         with self.banker.new_game(index) as game:
             result, tries, initial, clock_time = "", 0, True, 0
-            while result != "22222" and tries <= self.max_attempts:
+            while result != "22222" and tries < self.max_attempts:
                 try:
                     if initial:
                         solver.reset()
-                        initial = True
+                        initial = False
                     tik = time.process_time()
                     solver.before_guess()
                     guess = solver.guess()
@@ -24,12 +24,14 @@ class WordleProfiler:
                     solver.after_guess(result)
                     tok = time.process_time()
                     clock_time += tok - tik
+                except KeyboardInterrupt as e:
+                    raise e
                 except:
                     traceback.print_exc()
                     print("Exception occurs during the game, giving up...")
-                    tries = self.max_attempts + 1
                     break
             if result != "22222":
+                tries = self.max_attempts + 1
                 game.give_up()
         return tries, clock_time
 
@@ -37,7 +39,11 @@ class WordleProfiler:
         return self._evaluate_once(solver, index)
 
     def evaluate_all(self, solver):
-        r = {"words": {}, "time_cost": 0}
+        r = {"words": {}, "time_cost": 0, "meta": {}}
+        r["meta"] = {
+            "solver": solver.__class__.__name__,
+            "max_attempts": self.max_attempts
+        }
         self.record[solver.__class__.__name__] = r
         for idx, word in enumerate(self.dictionary):
             tries, clock_time = self._evaluate_once(solver, idx)

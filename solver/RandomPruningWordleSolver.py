@@ -1,6 +1,7 @@
 import random
 
 from wordle import WordleDictionary, WordleProfiler, BaseWordleSolver
+from wordle.util import brief
 
 class RandomPruningWordleSolver(BaseWordleSolver):
     def __init__(self, dictionary):
@@ -49,10 +50,15 @@ class RandomPruningWordleSolver(BaseWordleSolver):
             if self._compare(self.last_guess, word) == result:
                 new_possible.append(word)
         self.possible_word_list = new_possible
+    
+    def reset(self):
+        self.possible_word_list = list(dictionary)
+        self.last_guess = ""
 
 
 if __name__ == "__main__":
     dictionary = WordleDictionary()
     profiler = WordleProfiler(dictionary)
     solver = RandomPruningWordleSolver(dictionary)
-    print(profiler.evaluate_once(solver))
+    rdict = profiler.evaluate_all(solver)
+    brief(rdict)
