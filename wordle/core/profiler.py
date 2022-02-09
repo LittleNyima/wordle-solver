@@ -35,7 +35,13 @@ class WordleProfiler:
                 game.give_up()
         return tries, clock_time
 
-    def evaluate_once(self, solver, index=None):
+    def evaluate_once(self, solver, index=None, word=None):
+        assert index is None or word is None
+        if word is not None:
+            word = word.upper()
+            if word not in self.dictionary:
+                raise KeyError(word)
+            return self._evaluate_once(solver, self.dictionary.index(word))
         return self._evaluate_once(solver, index)
 
     def evaluate_all(self, solver):
