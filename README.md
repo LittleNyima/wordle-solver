@@ -2,11 +2,6 @@
 
 Implementation of [Wordle - A daily word game (powerlanguage.co.uk)](https://www.powerlanguage.co.uk/wordle/) game and a framework of evaluating Wordle solvers.
 
-
-## Installation
-
-`pip install -r requirements.txt`
-
 ## Examples
 
 - You can play the game manually:
@@ -42,6 +37,21 @@ Implementation of [Wordle - A daily word game (powerlanguage.co.uk)](https://www
   solver = RandomWordleSolver(dictionary)
   print(profiler.evaluate_once(solver))
   ```
+
+## Run
+
+If you use ipython, for example:
+
+```shell
+ipython solver/TheGreatWzkSolver.py
+```
+
+Or you should install the package first then you can run your code:
+
+```shell
+python setup.py install
+python solver/TheGreatWzkSolver.py
+```
 
 ## Contribution
 
