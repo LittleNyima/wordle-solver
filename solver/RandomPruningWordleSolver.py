@@ -3,6 +3,7 @@ import random
 from wordle import WordleDictionary, WordleProfiler, BaseWordleSolver
 from wordle.util import brief
 
+
 class RandomPruningWordleSolver(BaseWordleSolver):
     def __init__(self, dictionary):
         super().__init__(dictionary)
@@ -16,7 +17,7 @@ class RandomPruningWordleSolver(BaseWordleSolver):
             d.setdefault(letter, [])
             d[letter].append(idx)
         return d
-    
+
     def _compare(self, guess, word):
         guess_stats, word_stats = self._stats(guess), self._stats(word)
         result = [None] * 5
@@ -50,7 +51,7 @@ class RandomPruningWordleSolver(BaseWordleSolver):
             if self._compare(self.last_guess, word) == result:
                 new_possible.append(word)
         self.possible_word_list = new_possible
-    
+
     def reset(self):
         self.possible_word_list = list(dictionary)
         self.last_guess = ""

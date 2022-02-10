@@ -2,6 +2,7 @@ import os.path as osp
 
 from ordered_set import OrderedSet
 
+
 class WordleDictionary:
     def __init__(self, source=osp.join(osp.dirname(osp.realpath(__file__)), "..", "vocabulary.txt")):
         self.words = OrderedSet()
@@ -9,7 +10,7 @@ class WordleDictionary:
             lines = fin.readlines()
             for line in lines:
                 self.words.add(self._validate(line.strip()))
-    
+
     def _validate(self, word):
         assert word.isalpha(), "Parameter 'word' must consist of characters"
         assert len(word) == 5, "Parameter 'word' must consist of 5 characters"
@@ -17,7 +18,7 @@ class WordleDictionary:
 
     def __iter__(self):
         return self.words.__iter__()
-    
+
     def __len__(self):
         return self.words.__len__()
 
@@ -27,6 +28,7 @@ class WordleDictionary:
 
 if __name__ == "__main__":
     import random
+
     dictionary = WordleDictionary()
     assert "APPLE" in dictionary
     assert "NYIMA" not in dictionary

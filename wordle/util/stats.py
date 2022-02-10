@@ -1,5 +1,6 @@
 from .display import underline
 
+
 def brief(rdict, quiet=False):
     count = [0 for _ in range(rdict["meta"]["max_attempts"] + 2)]
     success, total = 0, len(rdict["words"])
