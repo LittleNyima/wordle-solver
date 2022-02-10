@@ -5,12 +5,13 @@ class WordleGame:
     def __init__(self, dictionary):
         self.dictionary = dictionary
 
-    def new_game(self, index=None, quiet=False):
+    def new_game(self, index=None, quiet=False, absurdle=False):
         _secret = self.dictionary[index] if index is not None else random.choice(self.dictionary)
-        return WordleGameWrapper(_secret, self.dictionary, quiet=quiet)
+        wrapper = AbsurdleGameWrapper if absurdle else WordleGameWrapper
+        return wrapper(_secret, self.dictionary, quiet=quiet)
 
 
-class WordleGameWrapper:
+class BaseWordleGameWrapper:
     def __init__(self, secret, dictionary, quiet=False):
         self._secret = secret
         self._secret_stats = self._stats(self._secret)
@@ -18,6 +19,7 @@ class WordleGameWrapper:
         self.is_close = False
         self.quiet = quiet
         self.attempts = 0
+        self.word_len = 5
 
     def __enter__(self):
         return self
@@ -39,7 +41,7 @@ class WordleGameWrapper:
     def _validate(self, word):
         assert type(word) is str, "Parameter 'word' must be string"
         assert word.isalpha(), "Parameter 'word' must consist of characters"
-        assert len(word) == 5, "Parameter 'word' must consist of 5 characters"
+        assert len(word) == self.word_len, "Parameter 'word' must consist of %d characters" % self.word_len
         word = word.upper()
         assert word in self.dictionary, "`%s` is not a valid word" % word
         return word
@@ -54,7 +56,7 @@ class WordleGameWrapper:
             the extra occurrence will lead to a `0`.
         """
         word_stats = self._stats(word)
-        result = [None] * 5
+        result = [None] * self.word_len
         for k, v in word_stats.items():
             if k not in self._secret_stats:
                 for idx in v:
@@ -76,19 +78,7 @@ class WordleGameWrapper:
               "Your guess:", word)
 
     def guess(self, word):
-        if self.is_close:
-            raise ValueError("Guess operation on an exit game")
-        word = self._validate(word)
-        result = self._compare(word)
-        self.attempts += 1
-        win = result == "22222"
-        if win:
-            self.is_close = True
-        if not self.quiet:
-            self._print_result(word, result)
-            if win:
-                print("Succeed with %d guesses" % self.attempts)
-        return result, self.attempts
+        raise NotImplementedError
 
     def give_up(self):
         if self.is_close:
@@ -97,6 +87,57 @@ class WordleGameWrapper:
             print("Give up after %d guesses, the secret is %s" % (self.attempts, self._secret))
         self.is_close = True
 
+
+class WordleGameWrapper(BaseWordleGameWrapper):
+    def __init__(self, secret, dictionary, quiet=False):
+        super(WordleGameWrapper, self).__init__(secret, dictionary, quiet)
+    
+    def guess(self, word):
+        if self.is_close:
+            raise ValueError("Guess operation on an exit game")
+        word = self._validate(word)
+        result = self._compare(word)
+        self.attempts += 1
+        win = result == "2" * self.word_len
+        if win:
+            self.is_close = True
+        if not self.quiet:
+            self._print_result(word, result)
+            if win:
+                print("Succeed with %d guesses" % self.attempts)
+        return result, self.attempts
+
+
+class AbsurdleGameWrapper(BaseWordleGameWrapper):
+    def __init__(self, secret, dictionary, quiet=False):
+        super(AbsurdleGameWrapper, self).__init__(secret, dictionary, quiet)
+        self._secret_candidate = list(dictionary)
+    
+    def guess(self, word):
+        if self.is_close:
+            raise ValueError("Guess operation on an exit game")
+        word = self._validate(word)
+        result_candidate, candidate = [], []
+        for c in self._secret_candidate:
+            self._secret_stats = self._stats(c)
+            r = self._compare(word)
+            if r not in result_candidate:
+                result_candidate.append(r)
+                candidate.append([])
+            candidate[result_candidate.index(r)].append(c)
+        candidate_count = [len(cand) for cand in candidate]
+        max_idx = candidate_count.index(max(candidate_count))
+        result = result_candidate[max_idx]
+        self._secret_candidate = candidate[max_idx]
+        self.attempts += 1
+        win = result == "2" * self.word_len
+        if win:
+            self.is_close = True
+        if not self.quiet:
+            self._print_result(word, result)
+            if win:
+                print("Succeed with %d guesses" % self.attempts)
+        return result, self.attempts
 
 if __name__ == "__main__":
     from dictionary import WordleDictionary
