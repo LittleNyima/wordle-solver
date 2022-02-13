@@ -6,7 +6,7 @@ Implementation of [Wordle - A daily word game (powerlanguage.co.uk)](https://www
 
 | Solver                                               | Contributor                                   | Last Update (UTC+8) | Success%   | Average Tries | Time Cost \* |
 | ---------------------------------------------------- | --------------------------------------------- | ------------------- | ---------- | ------------- | ------------ |
-| [RandomHobee](solver/RandomHobeeSolver.py)           | [HoBeedzc](https://github.com/HoBeedzc)       | 2022-02-10 11:50    | 97.19 \*\* | 4.1210 \*\*   | 14.1719 \*\* |
+| [RandomHobee](solver/RandomHobeeSolver.py)           | [HoBeedzc](https://github.com/HoBeedzc)       | 2022-02-13 22:17    | 98.83 \*\* | 4.0177 \*\*   | 14.4750 \*\* |
 | [TheGreatWzk](solver/TheGreatWzkSolver.py)           | [wzk1015](https://github.com/wzk1015)         | 2022-02-09 21:25    | 97.93      | 3.8907        | 13.4844      |
 | [RandomPruning](solver/RandomPruningWordleSolver.py) | [LittleNyima](https://github.com/LittleNyima) | 2022-02-09 19:31    | 98.36 \*\* | 4.1093 \*\*   | 27.1875 \*\* |
 
