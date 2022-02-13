@@ -7,6 +7,7 @@ from wordle.util import stats
 class RandomHobeeSolver(BaseWordleSolver):
     def __init__(self, dic):
         super().__init__(dic)
+        self.alpha_index = None
         self.last_guess = None
         self.last_result = None
         self.possible_dictionary = self.dictionary
@@ -18,6 +19,8 @@ class RandomHobeeSolver(BaseWordleSolver):
             if self.last_guess[i] == v and self.last_result[i] == "1":
                 return False
             elif self.last_guess[i] != v and self.last_result[i] == "2":
+                return False
+            elif self.last_guess[i] == v and self.last_result[i] == "0":
                 return False
 
         must_include = []
@@ -46,9 +49,24 @@ class RandomHobeeSolver(BaseWordleSolver):
 
         return True
 
+    def build_index(self, word):
+        total = 0
+        for i, v in enumerate(word):
+            total += self.alpha_index[i][v]
+        return total
+
     def before_guess(self):
+        if self.first_guess:
+            return
         # build dictionary index
-        pass
+        self.alpha_index = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}}
+        for word in self.possible_dictionary:
+            for i, w in enumerate(word):
+                self.alpha_index[i][w] = self.alpha_index[i].get(w, 0) + 1
+
+        self.dictionary_index = []
+        for word in self.possible_dictionary:
+            self.dictionary_index.append(self.build_index(word))
 
     def guess(self):
         if self.first_guess:
@@ -59,7 +77,7 @@ class RandomHobeeSolver(BaseWordleSolver):
                     first_guess_possible_dictionary.append(i)
             self.last_guess = random.choice(first_guess_possible_dictionary)
         else:
-            self.last_guess = random.choices(self.possible_dictionary, k=1)[0]
+            self.last_guess = random.choices(self.possible_dictionary, weights=self.dictionary_index, k=1)[0]
         return self.last_guess
 
     def after_guess(self, result):
